@@ -1,0 +1,13 @@
+body {
+  background: linear-gradient(to right, #e0f7fa, #f1f8e9);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.card {
+  border-radius: 12px;
+}
+
+.nav-tabs .nav-link.active {
+  background-color: #4a90e2;
+  color: white;
+}
