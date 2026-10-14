@@ -32,13 +32,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		? (int)$_POST['age']
 		: null;
 
-	$gender = ($_POST['gender'] ?? '') !== ''
-		? $_POST['gender']
-		: null;
+	// Accept the doctor's selection; the form is prefilled from the database.
+	$gender = trim($_POST['gender'] ?? '');
+	if (!in_array($gender, ['Male', 'Female'], true)) {
+		$error = 'Please select Male or Female for Sex (ML).';
+		$gender = '';
+	}
 
-	$sex = ($_POST['sex'] ?? '') !== ''
-		? (int)$_POST['sex']
-		: null;
+	// Map the selected gender to the ML feature: Male=1, Female=0.
+	$sex = ($gender === 'Male') ? 1 : (($gender === 'Female') ? 0 : null);
 
 	$cp = ($_POST['cp'] ?? '') !== ''
 		? (int)$_POST['cp']
@@ -274,99 +276,52 @@ $predictionHistory = $predictionStmt->get_result();
 
 							</div>
 
+						</div>
 
-							<!-- Age -->
+					</div>
 
-							<div class="col-md-6 mb-3">
-
-								<label class="form-label">
-									Age
-								</label>
-
-								<input
-									type="number"
-									name="age"
-									class="form-control"
-									min="1"
-									max="120"
-									value="<?= htmlspecialchars($profile['age'] ?? '') ?>"
-									required>
-
-							</div>
+				</div>
 
 
-							<!-- Gender -->
+				<!-- Symptoms / History -->
 
-							<div class="col-md-6 mb-3">
+				<div class="card shadow-sm mb-4">
 
-								<label class="form-label">
-									Gender
-								</label>
+					<div class="card-header">
 
-								<select
-									name="gender"
-									class="form-select"
-									required>
+						<h5 class="mb-0">
+							Symptoms & Medical History
+						</h5>
 
-									<option value="">
-										-- Select --
-									</option>
-
-									<option
-										value="Male"
-										<?= (($profile['gender'] ?? '') === 'Male') ? 'selected' : '' ?>>
-										Male
-									</option>
-
-									<option
-										value="Female"
-										<?= (($profile['gender'] ?? '') === 'Female') ? 'selected' : '' ?>>
-										Female
-									</option>
-
-									<option
-										value="Other"
-										<?= (($profile['gender'] ?? '') === 'Other') ? 'selected' : '' ?>>
-										Other
-									</option>
-
-								</select>
-
-							</div>
+					</div>
 
 
-							<!-- Sex -->
+					<div class="card-body">
 
-							<div class="col-md-6 mb-3">
+						<div class="mb-3">
 
-								<label class="form-label">
-									Sex (ML)
-								</label>
+							<label class="form-label">
+								Symptoms
+							</label>
 
-								<select
-									name="sex"
-									class="form-select"
-									required>
+							<textarea
+								name="symptoms"
+								class="form-control"
+								rows="3"><?= htmlspecialchars($profile['symptoms'] ?? '') ?></textarea>
 
-									<option value="">
-										-- Select --
-									</option>
+						</div>
 
-									<option
-										value="1"
-										<?= (($profile['sex'] ?? '') == 1) ? 'selected' : '' ?>>
-										Male (1)
-									</option>
 
-									<option
-										value="0"
-										<?= (($profile['sex'] ?? '') == 0) ? 'selected' : '' ?>>
-										Female (0)
-									</option>
+						<div class="mb-3">
 
-								</select>
+							<label class="form-label">
+								Medical History
+							</label>
 
-							</div>
+							<textarea
+								name="medical_history"
+								class="form-control"
+								rows="3"><?= htmlspecialchars($profile['medical_history'] ?? '') ?></textarea>
 
 						</div>
 
@@ -375,7 +330,9 @@ $predictionHistory = $predictionStmt->get_result();
 				</div>
 
 
-				<!-- Heart Disease Information -->
+
+
+								<!-- Heart Disease Information -->
 
 				<div class="card shadow-sm mb-4">
 
@@ -393,7 +350,22 @@ $predictionHistory = $predictionStmt->get_result();
 						<div class="row">
 
 
-							<!-- CP -->
+							<!-- Age: ML input feature -->
+							<div class="col-md-6 mb-3">
+								<label class="form-label">Age</label>
+								<input type="number" name="age" class="form-control" min="1" max="120" value="<?= htmlspecialchars($profile['age'] ?? '') ?>" required>
+							</div>
+
+			<!-- Sex (ML): prefilled from the database and editable by the doctor -->
+			<div class="col-md-6 mb-3">
+				<label class="form-label" for="gender">Sex (ML)</label>
+				<select name="gender" id="gender" class="form-select" required>
+					<option value="">-- Select --</option>
+					<option value="Male" <?= (strcasecmp(trim((string)($profile['gender'] ?? '')), 'Male') === 0) ? 'selected' : '' ?>>Male (1)</option>
+					<option value="Female" <?= (strcasecmp(trim((string)($profile['gender'] ?? '')), 'Female') === 0) ? 'selected' : '' ?>>Female (0)</option>
+				</select>
+			</div>
+<!-- CP -->
 
 							<div class="col-md-6 mb-3">
 
@@ -685,53 +657,6 @@ $predictionHistory = $predictionStmt->get_result();
 								</select>
 
 							</div>
-
-						</div>
-
-					</div>
-
-				</div>
-
-
-				<!-- Symptoms / History -->
-
-				<div class="card shadow-sm mb-4">
-
-					<div class="card-header">
-
-						<h5 class="mb-0">
-							Symptoms & Medical History
-						</h5>
-
-					</div>
-
-
-					<div class="card-body">
-
-						<div class="mb-3">
-
-							<label class="form-label">
-								Symptoms
-							</label>
-
-							<textarea
-								name="symptoms"
-								class="form-control"
-								rows="3"><?= htmlspecialchars($profile['symptoms'] ?? '') ?></textarea>
-
-						</div>
-
-
-						<div class="mb-3">
-
-							<label class="form-label">
-								Medical History
-							</label>
-
-							<textarea
-								name="medical_history"
-								class="form-control"
-								rows="3"><?= htmlspecialchars($profile['medical_history'] ?? '') ?></textarea>
 
 						</div>
 

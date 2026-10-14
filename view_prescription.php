@@ -189,7 +189,7 @@ $medicines = $medicineStmt->fetchAll();
 			</h2>
 
 			<p class="text-muted mb-0">
-				Clinic Management System
+				Medipulse
 			</p>
 
 		</div>
