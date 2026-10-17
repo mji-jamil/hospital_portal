@@ -1,0 +1,11 @@
+medipulse.free.nf
+if0_42853751
+Jamil134653
+sql301.infinityfree.com
+
+new mysqli(
+    "sql301.infinityfree.com",
+    "if0_42853751",
+    "Jamil134653",
+    "if0_42853751_hospital_db"
+);
